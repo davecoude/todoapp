@@ -1,49 +1,55 @@
-// Estado de la aplicación: Intentar cargar de localStorage, si no hay nada, iniciar vacío
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let currentFilter = "all";
+// Estado de la aplicación encapsulado
+const state = {
+  tasks: JSON.parse(localStorage.getItem("tasks")) || [],
+  currentFilter: "all"
+};
 
-// HU-01: Soporte para la tecla Enter
-function handleInputKey(event) {
-  if (event.key === "Enter") {
-    addTask();
-  }
-}
+// Selectores del DOM cacheados
+const DOM = {
+  input: document.getElementById('taskInput'),
+  errorMsg: document.getElementById('inputError'),
+  addBtn: document.getElementById('addTaskBtn'),
+  list: document.getElementById("taskList"),
+  counter: document.getElementById("counter"),
+  filtersGroup: document.getElementById("filtersGroup")
+};
 
-// HU-01: Agregar tarea y validación de longitud mínima
+// HU-01: Agregar tarea con validación robusta
 function addTask() {
-  const input = document.getElementById('taskInput');
-  const errorMsg = document.getElementById('inputError');
-  const text = input.value.trim();
+  const text = DOM.input.value.trim();
 
-  // Validación: no vacío y mínimo 3 caracteres
   if (!text || text.length < 3) {
-    errorMsg.textContent = text.length === 0
+    DOM.errorMsg.textContent = text.length === 0
       ? 'Escribe una tarea antes de agregar.'
       : 'La tarea debe tener al menos 3 caracteres.';
-    input.focus();
+    DOM.input.focus();
     return;
   }
 
-  errorMsg.textContent = ''; // Limpiar error previo
-  tasks.push({ id: Date.now(), text, done: false });
-  input.value = '';
-  input.focus(); // Mantener foco para agregar rápido
+  DOM.errorMsg.textContent = ''; 
+  state.tasks.push({ 
+    id: Date.now(), 
+    text, 
+    done: false,
+    completedAt: null 
+  });
+  
+  DOM.input.value = '';
+  DOM.input.focus();
   render();
 }
 
-// HU-02: toggle con timestamp de completado
+// HU-02: Alternar estado con timestamp localizado
 function toggleTask(id) {
-  tasks = tasks.map((t) => {
-    if (t.id !== id) return t;
+  state.tasks = state.tasks.map((task) => {
+    if (task.id !== id) return task;
+    const nextDone = !task.done;
     return {
-      ...t,
-      done: !t.done,
-      completedAt: !t.done
-        ? new Date().toLocaleTimeString("es-CO", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : null,
+      ...task,
+      done: nextDone,
+      completedAt: nextDone
+        ? new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })
+        : null
     };
   });
   render();
@@ -51,65 +57,98 @@ function toggleTask(id) {
 
 // HU-03: Eliminar tarea
 function deleteTask(id) {
-  tasks = tasks.filter((t) => t.id !== id);
+  state.tasks = state.tasks.filter((task) => task.id !== id);
   render();
 }
 
-// HU-04: Filtrar tareas
-function filterTasks(filter) {
-  currentFilter = filter;
+// HU-04: Gestión de filtros de visualización
+function setFilter(filter) {
+  state.currentFilter = filter;
   render();
 }
 
-// HU-04: Actualizar contador, guardar en localStorage, gestionar filtros y renderizar lista
-function render() {
-  const list = document.getElementById("taskList");
-  const counter = document.getElementById("counter");
+// Generador seguro de plantillas HTML para prevenir inyecciones XSS
+function createTaskDOMElement(task) {
+  const li = document.createElement("li");
+  if (task.done) li.classList.add("done");
 
-  // Guardar el estado actual en localStorage antes de pintar
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  const label = document.createElement("label");
+  label.className = "task-label";
 
-  // HU-04: Resaltar visualmente el filtro activo mutando las clases del DOM
-  document.querySelectorAll(".filters button").forEach((btn) => {
-    btn.classList.remove("active");
-  });
-  const activeBtn = document.getElementById(`filter-${currentFilter}`);
-  if (activeBtn) {
-    activeBtn.classList.add("active");
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = task.done;
+  checkbox.setAttribute("aria-label", `Marcar tarea: ${task.text}`);
+  checkbox.addEventListener("change", () => toggleTask(task.id));
+
+  const textSpan = document.createElement("span");
+  textSpan.textContent = task.text; // Seguro contra XSS
+
+  label.appendChild(checkbox);
+  label.appendChild(textSpan);
+
+  if (task.done && task.completedAt) {
+    const timeSmall = document.createElement("small");
+    timeSmall.className = "completed-time";
+    timeSmall.textContent = `✓ ${task.completedAt}`;
+    label.appendChild(timeSmall);
   }
 
-  const filtered = tasks.filter((t) => {
-    if (currentFilter === "active") return !t.done;
-    if (currentFilter === "done") return t.done;
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.textContent = "Eliminar";
+  deleteBtn.addEventListener("click", () => deleteTask(task.id));
+
+  li.appendChild(label);
+  li.appendChild(deleteBtn);
+  return li;
+}
+
+// Motor de Renderizado
+function render() {
+  // Sincronización con almacenamiento local
+  localStorage.setItem("tasks", JSON.stringify(state.tasks));
+
+  // Renderizador de filtros activos
+  Array.from(DOM.filtersGroup.children).forEach((btn) => {
+    const isCurrent = btn.dataset.filter === state.currentFilter;
+    btn.classList.toggle("active", isCurrent);
+  });
+
+  // Filtrado lógico
+  const filteredTasks = state.tasks.filter((task) => {
+    if (state.currentFilter === "active") return !task.done;
+    if (state.currentFilter === "done") return task.done;
     return true;
   });
 
-  list.innerHTML = filtered
-    .map(
-      (t) => `
-  <li class="${t.done ? "done" : ""}">
-    <label class="task-label">
-      <input 
-        type="checkbox" 
-        ${t.done ? "checked" : ""} 
-        onchange="toggleTask(${t.id})"
-        aria-label="Marcar tarea: ${t.text}">
-      <span>${t.text}</span>
-      ${
-        t.done && t.completedAt
-          ? `<small class="completed-time">✓ ${t.completedAt}</small>`
-          : ""
-      }
-    </label>
-    <button class="delete-btn" onclick="deleteTask(${t.id})">Eliminar</button>
-  </li>
-`,
-    )
-    .join("");
+  // Reconstrucción del contenedor de lista de forma limpia y segura
+  DOM.list.innerHTML = "";
+  filteredTasks.forEach(task => {
+    DOM.list.appendChild(createTaskDOMElement(task));
+  });
 
-  const pending = tasks.filter((t) => !t.done).length;
-  counter.textContent = `Tareas pendientes: ${pending}`;
+  // Actualización del contador
+  const pendingCount = state.tasks.filter((task) => !task.done).length;
+  DOM.counter.textContent = `Tareas pendientes: ${pendingCount}`;
 }
 
-// Ejecutar el render inicial para mostrar las tareas guardadas al abrir la app
+// Inicializador de Event Listeners modernos (Cero código JS en HTML)
+function initEventListeners() {
+  DOM.addBtn.addEventListener("click", addTask);
+  
+  DOM.input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addTask();
+  });
+
+  DOM.filtersGroup.addEventListener("click", (e) => {
+    const filterBtn = e.target.closest("button");
+    if (filterBtn) {
+      setFilter(filterBtn.dataset.filter);
+    }
+  });
+}
+
+// Inicialización de la aplicación
+initEventListeners();
 render();
