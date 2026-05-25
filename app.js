@@ -13,9 +13,21 @@ function addTask() {
   render();
 }
 
-// HU-02: Marcar como completada
+// HU-02: toggle con timestamp de completado
 function toggleTask(id) {
-  tasks = tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t));
+  tasks = tasks.map((t) => {
+    if (t.id !== id) return t;
+    return {
+      ...t,
+      done: !t.done,
+      completedAt: !t.done
+        ? new Date().toLocaleTimeString("es-CO", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : null,
+    };
+  });
   render();
 }
 
@@ -45,11 +57,23 @@ function render() {
   list.innerHTML = filtered
     .map(
       (t) => `
-    <li class="${t.done ? "done" : ""}">
-      <span onclick="toggleTask(${t.id})" style="cursor:pointer">${t.text}</span>
-      <button class="delete-btn" onclick="deleteTask(${t.id})">Eliminar</button>
-    </li>
-  `,
+  <li class="${t.done ? "done" : ""}">
+    <label class="task-label">
+      <input 
+        type="checkbox" 
+        ${t.done ? "checked" : ""} 
+        onchange="toggleTask(${t.id})"
+        aria-label="Marcar tarea: ${t.text}">
+      <span>${t.text}</span>
+      ${
+        t.done && t.completedAt
+          ? `<small class="completed-time">✓ ${t.completedAt}</small>`
+          : ""
+      }
+    </label>
+    <button class="delete-btn" onclick="deleteTask(${t.id})">Eliminar</button>
+  </li>
+`,
     )
     .join("");
 
