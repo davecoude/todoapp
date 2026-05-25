@@ -1,8 +1,15 @@
-// Estado de la aplicación
-let tasks = [];
+// Estado de la aplicación: Intentar cargar de localStorage, si no hay nada, iniciar vacío
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let currentFilter = "all";
 
-// HU-01: Agregar tarea y soporte Enter + validación de longitud mínima
+// HU-01: Soporte para la tecla Enter
+function handleInputKey(event) {
+  if (event.key === "Enter") {
+    addTask();
+  }
+}
+
+// HU-01: Agregar tarea y validación de longitud mínima
 function addTask() {
   const input = document.getElementById('taskInput');
   const errorMsg = document.getElementById('inputError');
@@ -54,10 +61,13 @@ function filterTasks(filter) {
   render();
 }
 
-// HU-04: Actualizar contador y renderizar lista
+// HU-04: Actualizar contador, guardar en localStorage y renderizar lista
 function render() {
   const list = document.getElementById("taskList");
   const counter = document.getElementById("counter");
+
+  // Guardar el estado actual en localStorage antes de pintar
+  localStorage.setItem("tasks", JSON.stringify(tasks));
 
   const filtered = tasks.filter((t) => {
     if (currentFilter === "active") return !t.done;
@@ -66,8 +76,8 @@ function render() {
   });
 
   list.innerHTML = filtered
-    .map(
-      (t) => `
+  .map(
+    (t) => `
   <li class="${t.done ? "done" : ""}">
     <label class="task-label">
       <input 
@@ -85,9 +95,12 @@ function render() {
     <button class="delete-btn" onclick="deleteTask(${t.id})">Eliminar</button>
   </li>
 `,
-    )
-    .join("");
+  )
+  .join("");
 
   const pending = tasks.filter((t) => !t.done).length;
-  counter.textContent = `Tareas pendientes: ${pending}`;
+  counter.textContent = `Tareas pendientes: \${pending}`;
 }
+
+// Ejecutar el render inicial para mostrar las tareas guardadas al abrir la app
+render();
