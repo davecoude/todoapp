@@ -11,6 +11,7 @@ body {
   justify-content: center;
   padding: 40px;
 }
+
 .container {
   background: white;
   padding: 30px;
@@ -19,21 +20,25 @@ body {
   max-width: 500px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 h1 {
   margin-bottom: 20px;
   color: #333;
 }
+
 .input-group {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
 }
+
 input {
   flex: 1;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
 }
+
 button {
   padding: 10px 16px;
   background: #4caf50;
@@ -42,18 +47,31 @@ button {
   border-radius: 6px;
   cursor: pointer;
 }
+
 button:hover {
   opacity: 0.9;
 }
+
 .filters {
   display: flex;
   gap: 8px;
   margin-bottom: 15px;
 }
+
 .filters button {
   background: #eee;
   color: #333;
+  transition: all 0.2s ease;
 }
+
+/* HU-04: Resaltado visual estilizado para el filtro activo */
+.filters button.active {
+  background: #2196F3;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4);
+}
+
 li {
   display: flex;
   justify-content: space-between;
@@ -61,22 +79,25 @@ li {
   padding: 10px;
   border-bottom: 1px solid #eee;
 }
+
 li.done span {
   text-decoration: line-through;
   color: #aaa;
 }
+
 #counter {
   margin-bottom: 10px;
   color: #666;
   font-size: 14px;
 }
+
 .delete-btn {
   background: #e74c3c;
   padding: 5px 10px;
   font-size: 12px;
 }
 
-/* NUEVO — HU-02: checkbox y timestamp */
+/* HU-02: checkbox y timestamp */
 .task-label {
   display: flex;
   align-items: center;
@@ -98,12 +119,7 @@ li.done span {
   margin-left: 6px;
 }
 
-li.done span {
-  text-decoration: line-through;
-  color: #aaa;
-}
-
-/* NUEVO — HU-03: Estilos para el indicador de persistencia */
+/* HU-03: Estilos para el indicador de persistencia */
 .persistence-footer {
   margin-top: 25px;
   padding-top: 15px;

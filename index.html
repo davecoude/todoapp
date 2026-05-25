@@ -9,7 +9,6 @@
     <div class="container">
       <h1>📝 Mis Tareas</h1>
 
-      <!-- HU-01: Agregar tarea -->
       <div class="input-group">
         <input
           type="text"
@@ -22,20 +21,16 @@
         <button onclick="addTask()">Agregar</button>
       </div>
 
-      <!-- HU-04: Contador -->
       <p id="counter">Tareas pendientes: 0</p>
 
-      <!-- HU-05: Filtros -->
       <div class="filters">
-        <button onclick="filterTasks('all')">Todas</button>
-        <button onclick="filterTasks('active')">Activas</button>
-        <button onclick="filterTasks('done')">Completadas</button>
+        <button id="filter-all" onclick="filterTasks('all')">Todas</button>
+        <button id="filter-active" onclick="filterTasks('active')">Activas</button>
+        <button id="filter-done" onclick="filterTasks('done')">Completadas</button>
       </div>
 
-      <!-- Lista de tareas -->
       <ul id="taskList"></ul>
 
-      <!-- NUEVO — HU-03: Indicador de persistencia para el usuario -->
       <div class="persistence-footer">
         <span class="cloud-icon">💾</span> Tus tareas se guardan automáticamente en este dispositivo.
       </div>

@@ -55,19 +55,28 @@ function deleteTask(id) {
   render();
 }
 
-// HU-05: Filtrar tareas
+// HU-04: Filtrar tareas
 function filterTasks(filter) {
   currentFilter = filter;
   render();
 }
 
-// HU-04: Actualizar contador, guardar en localStorage y renderizar lista
+// HU-04: Actualizar contador, guardar en localStorage, gestionar filtros y renderizar lista
 function render() {
   const list = document.getElementById("taskList");
   const counter = document.getElementById("counter");
 
   // Guardar el estado actual en localStorage antes de pintar
   localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  // HU-04: Resaltar visualmente el filtro activo mutando las clases del DOM
+  document.querySelectorAll(".filters button").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  const activeBtn = document.getElementById(`filter-${currentFilter}`);
+  if (activeBtn) {
+    activeBtn.classList.add("active");
+  }
 
   const filtered = tasks.filter((t) => {
     if (currentFilter === "active") return !t.done;
@@ -76,8 +85,8 @@ function render() {
   });
 
   list.innerHTML = filtered
-  .map(
-    (t) => `
+    .map(
+      (t) => `
   <li class="${t.done ? "done" : ""}">
     <label class="task-label">
       <input 
@@ -95,11 +104,11 @@ function render() {
     <button class="delete-btn" onclick="deleteTask(${t.id})">Eliminar</button>
   </li>
 `,
-  )
-  .join("");
+    )
+    .join("");
 
   const pending = tasks.filter((t) => !t.done).length;
-  counter.textContent = `Tareas pendientes: \${pending}`;
+  counter.textContent = `Tareas pendientes: ${pending}`;
 }
 
 // Ejecutar el render inicial para mostrar las tareas guardadas al abrir la app
