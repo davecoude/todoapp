@@ -1,38 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>To-Do App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do App Profesional</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
       <h1>📝 Mis Tareas</h1>
 
-      <div class="input-group">
-        <input
-          type="text"
-          id="taskInput"
-          placeholder="Nueva tarea..."
-          maxlength="100"
-          onkeydown="handleInputKey(event)"
-        />
+      <div class="input-wrapper">
+        <div class="input-group">
+          <input
+            type="text"
+            id="taskInput"
+            placeholder="Nueva tarea..."
+            maxlength="100"
+          />
+          <button id="addTaskBtn">Agregar</button>
+        </div>
         <span id="inputError" class="error-msg"></span>
-        <button onclick="addTask()">Agregar</button>
       </div>
 
       <p id="counter">Tareas pendientes: 0</p>
 
-      <div class="filters">
-        <button id="filter-all" onclick="filterTasks('all')">Todas</button>
-        <button id="filter-active" onclick="filterTasks('active')">Activas</button>
-        <button id="filter-done" onclick="filterTasks('done')">Completadas</button>
+      <div class="filters" id="filtersGroup">
+        <button id="filter-all" data-filter="all">Todas</button>
+        <button id="filter-active" data-filter="active">Activas</button>
+        <button id="filter-done" data-filter="done">Completadas</button>
       </div>
 
       <ul id="taskList"></ul>
 
       <div class="persistence-footer">
-        <span class="cloud-icon">💾</span> Tus tareas se guardan automáticamente en este dispositivo.
+        <span class="cloud-icon" aria-hidden="true">💾</span> 
+        <span>Tus tareas se guardan automáticamente en este dispositivo.</span>
       </div>
     </div>
     <script src="app.js"></script>
