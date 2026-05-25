@@ -75,3 +75,12 @@ li.done span {
   padding: 5px 10px;
   font-size: 12px;
 }
+
+/*HU-01: feedback de validación */
+.error-msg {
+  display: block;
+  color: #e74c3c;
+  font-size: 12px;
+  min-height: 16px;
+  margin-top: 4px;
+}

@@ -11,7 +11,14 @@
 
       <!-- HU-01: Agregar tarea -->
       <div class="input-group">
-        <input type="text" id="taskInput" placeholder="Nueva tarea..." />
+        <input
+          type="text"
+          id="taskInput"
+          placeholder="Nueva tarea..."
+          maxlength="100"
+          onkeydown="handleInputKey(event)"
+        />
+        <span id="inputError" class="error-msg"></span>
         <button onclick="addTask()">Agregar</button>
       </div>
 

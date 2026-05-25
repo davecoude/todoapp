@@ -2,15 +2,31 @@
 let tasks = [];
 let currentFilter = "all";
 
-// HU-01: Agregar tarea
+// HU-01: Agregar tarea y soporte Enter + validación de longitud mínima
 function addTask() {
-  const input = document.getElementById("taskInput");
+  const input = document.getElementById('taskInput');
+  const errorMsg = document.getElementById('inputError');
   const text = input.value.trim();
-  if (!text) return;
 
+  // Validación: no vacío y mínimo 3 caracteres
+  if (!text || text.length < 3) {
+    errorMsg.textContent = text.length === 0
+      ? 'Escribe una tarea antes de agregar.'
+      : 'La tarea debe tener al menos 3 caracteres.';
+    input.focus();
+    return;
+  }
+
+  errorMsg.textContent = ''; // Limpiar error previo
   tasks.push({ id: Date.now(), text, done: false });
-  input.value = "";
+  input.value = '';
+  input.focus(); // Mantener foco para agregar rápido
   render();
+}
+
+// Soporte para tecla Enter
+function handleInputKey(event) {
+  if (event.key === 'Enter') addTask();
 }
 
 // HU-02: Marcar como completada
