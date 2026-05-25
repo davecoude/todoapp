@@ -76,11 +76,29 @@ li.done span {
   font-size: 12px;
 }
 
-/*HU-01: feedback de validación */
-.error-msg {
-  display: block;
-  color: #e74c3c;
-  font-size: 12px;
-  min-height: 16px;
-  margin-top: 4px;
+/* NUEVO — HU-02: checkbox y timestamp */
+.task-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.task-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4CAF50;
+}
+
+.completed-time {
+  font-size: 11px;
+  color: #aaa;
+  margin-left: 6px;
+}
+
+li.done span {
+  text-decoration: line-through;
+  color: #aaa;
 }
